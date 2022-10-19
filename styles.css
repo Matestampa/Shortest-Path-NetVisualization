@@ -12,6 +12,8 @@ label{
 select{
     background-color: #29f3cf;
     border-radius: 10px;
+    border-width:3px;
+    cursor:pointer;
 }
 
 /*---------------------- Range --------------------------*/

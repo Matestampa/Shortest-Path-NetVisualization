@@ -14,6 +14,7 @@ let HTML=`<div style="text-align:center">
 <div style="text-align:center;position: relative;top:10">
 <button class="normal-btn" onclick="select_start()" id="select_startBtn">Selct.Start</button>
 <button class="normal-btn" onclick="select_end()" id="select_endBtn">Selct.End</button>
+<button class="normal-btn" onclick="remove_edge()" id="remove_edgeBtn">Remove.Edge</button>
 <select id="algorithm">
     <option selected disabled>Algorithm</option>
     <option value="Dijkstra">Dijkstra</option>
@@ -39,13 +40,16 @@ const functions={"generate":(GameMode)=>{
     "select_start":(GameMode)=>{
         GameMode.allowSelect_startNode();},
     "select_end":(GameMode)=>{
-        GameMode.allowSelect_finishNode();}
+        GameMode.allowSelect_finishNode();},
+    "remove_edge":(GameMode)=>{
+        GameMode.allowRemove_Edge();}
     }
 
 //------------ Objetos del DOM con los que interactuamos -------------------------
 let ObJ_Manager=new Dom_Manager();
 ObJ_Manager.set_objsData([{"id":"nodes","type":"range"},{"id":"conex","type":"range"},{"id":"algorithm","type":"select"},
-{"id":"dist","type":"text"},{"id":"show-steps","type":"checkbox"},{"id":"select_startBtn","type":"button"},{"id":"select_endBtn","type":"button"}]);
+{"id":"dist","type":"text"},{"id":"show-steps","type":"checkbox"},{"id":"select_startBtn","type":"button"},
+{"id":"select_endBtn","type":"button"},{"id":"remove_edgeBtn","type":"button"}]);
 
 
 //--------------------------- clase GameMode ---------------------------------
@@ -59,6 +63,7 @@ class ShowPath_GameMode extends Base_GameMode{
         //Deshabilitar Cosas de abajo (botones)
         this.Dom_Manager.disable("select_startBtn");
         this.Dom_Manager.disable("select_endBtn");
+        this.Dom_Manager.disable("remove_edgeBtn");
         //this.Dom_Manager.disable("algorithm")
 
     }
@@ -67,11 +72,17 @@ class ShowPath_GameMode extends Base_GameMode{
         this.__setAll_default();
         this.nodeSelection_callback=this.nodeSelection["start"];
         //deshabilitar end button
-        this.Dom_Manager.disable("select_endBtn")
+        this.Dom_Manager.disable("select_endBtn");
+        this.Dom_Manager.disable("remove_edgeBtn");
     }
   
     allowSelect_finishNode(){//actibamos modo de selecionar nodo de finish
         this.nodeSelection_callback=this.nodeSelection["finish"];
+        this.Dom_Manager.disable("remove_edgeBtn");
+    }
+
+    allowRemove_Edge(){
+        this.__set_edges("on");
     }
     
     p_afterGenerate(){
@@ -80,6 +91,7 @@ class ShowPath_GameMode extends Base_GameMode{
 
         this.Dom_Manager.enable("select_startBtn")//habilitar select startNode button
         this.Dom_Manager.disable("select_endBtn");//deshabilitar  select endNode button
+        this.Dom_Manager.disable("remove_edgeBtn");
     }
 
     p_onNode_click(obj){ //callback para el Event click del node
@@ -94,7 +106,7 @@ class ShowPath_GameMode extends Base_GameMode{
         this.DrawManager.remove([obj.value]);//borrar edge de pantalla
         
         this.__set_edges("off");
-        this.__show_path();//llamar a la funcion de find_path()
+        this.__show_path();
         this.__set_edges("on");//habilitar edges de nuevo
     }
 
@@ -105,13 +117,14 @@ class ShowPath_GameMode extends Base_GameMode{
         
         //elegir algorithm de pantalla
         let pathAlgorithm=this.Dom_Manager.get("algorithm");
+        if (pathAlgorithm=="Algorithm"){alert("Choose an Algorithm");return;}
         
         let results=this.__find_path(this.start_node,this.end_node,pathAlgorithm);
         let [path,steps]=[results.path,results.steps];
 
         if (path.length==0){ //si no hay path posible
             await this.__animate(steps,this.active_colors,5); //solo mostramos los steps
-            alert("No existe un camino al nodo seleccionado")
+            alert("There is no path")
             //------------------- SHOW INFO (NO EXISTE PATH) --------------------------
         }
         else if (this.Dom_Manager.get("show-steps")==false){ //Si no se quieren los steps
@@ -143,11 +156,12 @@ class ShowPath_GameMode extends Base_GameMode{
           this.end_node=obj.value;
           this.__show_path();
           this.__set_edges("off")//por las dudas para que no buguee
-          this.__set_edges("on");
+          //this.__set_edges("on");
+          this.Dom_Manager.enable("remove_edgeBtn");
         }
         else{
           //--------------------- SHOW ERROR ------------------------------------------
-          throw new Error("No ha elegido un punto de partida o ha elegido el mismo");
+          alert("You haven't choosen a start point or have choosen the same");
         }
     }
 

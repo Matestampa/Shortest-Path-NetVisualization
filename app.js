@@ -38,7 +38,7 @@ function ChangeMode(){
         
         GameMode=GAME_MODES[curr_mode];
     
-        //Cambiar Html
+        //Cambia Html
         controls_zone.innerHTML=GameMode.html;
     
         //Nueva Clase GameMode

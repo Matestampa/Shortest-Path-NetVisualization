@@ -107,7 +107,7 @@ export class GraphDraw_Manager{
         }
         let object_data={"left":node.x_cor-(this.node_size/2),"top":node.y_cor-(this.node_size/2),
                                       "radius":this.node_size/2,
-                                      "fill":color,"hasControls":false,"hasBorders":false,
+                                      "fill":color,"hasControls":false,"hasBorders":false,"hoverCursor":"default",
                                       "lockMovementX":this.node_movility,"lockMovementY":this.node_movility};
         
         let new_node=new GraphDraw_Node(node.value,object_data);
@@ -123,7 +123,7 @@ export class GraphDraw_Manager{
           color=this.DEAFULT_EDGE_COLOR
         }  
       let object_data={"coords":[edge.x_cor1,edge.y_cor1,edge.x_cor2,edge.y_cor2],
-                         "attrs":{"stroke":color,"hasControls":false,"hasBorders":false,
+                         "attrs":{"stroke":color,"hasControls":false,"hasBorders":false,"hoverCursor":"default",
                                   "lockMovementX":this.edge_movility,"lockMovementY":this.edge_movility,"strokeWidth":2}};
         
         let new_edge=new GraphDraw_Edge(edge.value,object_data);
@@ -167,6 +167,7 @@ export class GraphDraw_Manager{
         obj.cv_object.on("selected",function(){
           return callback(obj);
         })
+        obj.cv_object.hoverCursor="pointer";
       }
     }
     
@@ -175,6 +176,7 @@ export class GraphDraw_Manager{
       let objs=this.objects.get(tags);
       for (let obj of objs){
         obj.cv_object.off("selected");
+        obj.cv_object.hoverCursor="default";
       }
     }
     

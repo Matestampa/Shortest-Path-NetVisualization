@@ -63,6 +63,7 @@ export class GraphGenerator{
 
 //------------------------------------ Generador de Shortest Path ------------------------------------------------------
 
+
 const SHORT_PATH_ALGORITHMS={"Dijkstra":Dijkstra,"A*":A_Star};
 
 //Genera el shortest path, formateado para GameMode

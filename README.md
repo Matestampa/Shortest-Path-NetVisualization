@@ -9,6 +9,7 @@ edges and see how the path change.
 This project has been hard-working for me, and I'm satisfied with the result (except the frontend which never was the focus jaja) and what I've learnt.
 
 ![ezgif-5-f183755ec7](https://github.com/Matestampa/Shortest-Path-NetVisualization/assets/69252997/a79553a5-e379-4efb-982a-291ea55f233b)
+
 Demo of the project in the link of top. Explanation video for any doubt: https://futurelink.com
 
 I hope you enjoy it, and I would be glad to hear your comments.

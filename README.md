@@ -10,7 +10,7 @@ This project has been hard-working for me, and I'm satisfied with the result (ex
 
 ![ezgif-5-f183755ec7](https://github.com/Matestampa/Shortest-Path-NetVisualization/assets/69252997/a79553a5-e379-4efb-982a-291ea55f233b)
 
-Demo of the project in the link above. Explanation video for any doubt related with functionality: https://www.youtube.com/watch?v=_-7lxCneG0A
+Demo of the project in the link on top. Explanation video for any doubt related with functionality: https://www.youtube.com/watch?v=_-7lxCneG0A
 
 I hope you enjoy it, and I would be glad to hear your comments.
 

@@ -1,4 +1,4 @@
-import {PriorQueue} from "./extras.js";
+import {PriorQueue} from "../../../utils/pQueue.js";
 
 function get_distance(node1,node2){
     return Math.sqrt((node2.x_cor-node1.x_cor)**2 + (node2.y_cor-node1.y_cor)**2);

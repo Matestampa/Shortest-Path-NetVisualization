@@ -1,0 +1,79 @@
+################## -Explicacion General del funcionamiento- ############################
+########################################################################################
+
+-Archivo Principal (app.js):
+    -Ajusta el Canvas a la pantalla (que la cubra hasta abajo)
+    -Se encarga de los cambios de GameMode. Y de modificar el DOM y demas
+     en base a las caracteristicas de c/u.
+
+----------------------------------------------------------------------------------
+-Game Modes:
+    -Un GameMode debe exportar si o si un object con:
+        -"html":el html particular del Mode (controles, texto, etc)
+        
+        -"functions": un obj con las funciones que aparezcan en el html
+                      {"key"->nombre usado en el html, value->callback}
+        
+        -Obj_Manager: es un obj de tipo Dom_Manager()
+                      se ponen los ids de los elements del html y su tipo, a los que se quiera acceder
+                      facilmente. app.js se lo va a pasar a la class para que los pueda usar.
+        
+        -class: clase que debe heredar de Base_GameMode(), y donde se encuentra la logica del Mode.
+                Debido a esta herencia, todos cuentan con la integracion de GraphGenerator() que crea el Grafo.
+                Y tambien cuentan con generate_shortPath() mediante this.__find_path().
+
+----------------------------------------------------------------------------
+-Graph Generator section:
+    -Tenemos un archivo principal (generators.js), donde deberian convivir los distintos GraphGenerators.
+     Por ahora solo tenemos uno y no hicimos arquitectura para que hayan varias clases. Asi que hablemos de este.
+     Cabe destacar que aqui se importa todo lo de la carpeta GraphGenerator_tools.
+     
+    -La funcion de GraphGenerator() es devolver con cada generate(), tanto un InMemory_Graph() (el Grafo en dataStructure)
+       como tambien un GraphDraw_Manager() (el Grafo en dibujo con el que se puede interactuar)
+     
+     -Primero genera la data del Grafo con la clase RandGraphData_Generator(), luego la formatea y la usa para construir
+      las dos clases mencionadas anteeiormente. (InMemory_Graph, GraphDraw_Manager)
+     
+     Por eso al construir el GraphGenerator() se le pasa data que necesite el RandGraphData_Generator(), asi como tambien que necesite
+      el GraphDraw_Manager (colores de nodos, de edges, el objeto canvas, etc)
+     
+     Tambien tiene la opcion de pasarle un type. Como lo tenemos ahora, ese type tambien se le pasa al RandGraphData_Generator().
+       Que segun ese type elije de que forma generar el Grafo. Sin embargo, por ahora tambien tenemos uno solo ("alligned"). Y por eso dejamos fijo ese.
+
+
+-RandGraphData_Generator():
+     -Forma parte de GraphGenerator_tools en la carpeta DataGraph_Generators.
+     -Como vimos antes, esta clase se encarga de generar la data del Grafo (basicamente es quien crea el Grafo)(hace los calculos todo, etc)
+     
+     -Como genera la data:
+           -Primero que nada recibe ciertos params al contruirse, como el espacio total, el tamaño del node, la minima distancia entre nodes, etc.
+           -El sistema esta basado en crear distintas divisiones en el espacio total.
+           -Luego crea nodos random (que no se toquen) en cada una de esas divisiones.
+           -Luego conecta los nodos dentro de cada division
+           -Por ultimo elije ciertos nodos y los conecta con nodes de otras divisiones (conecta las divisiones)
+           
+           -Si usaramos distintos types, lo que cambiaria es la forma de generar las divisiones. Osea el DivisionsGenerator().
+            Lo demas es fijo (conectar nodos, conectar divs, el objeto node, el objeto Division, etc)
+            
+            Por ahora solo tenemos uno "AlignedRandom_DivisionsGenerator()" que hereda de DivisionsGenerator().
+            Si se quiere hacer otro, estan muy bien especificados los requisitos que debe cumplir en el mismo archivo "DivGenerator.js".
+     
+     Como devuelve la data: (el formato)
+           -Devuelve un arr con todo lo que creo. Cada cosa creada la devuelve en un obj lit.
+           -Los nodes son {"type":"node", "value"->coordenada} coordenada="{coord_x},{coord_y}"
+           -Los edges son {"type":"edge", "value"->coordenadas de ambos nodes} coordenadas de ambos="{cordenadas_node1}-{cordenadas_node2}"
+                                                                               Las coords son iguales que las de arriba.
+                                                                               Estan separadas las de un node de las otras por un "-"
+            
+            Por eso si recibimos un edge, y queremos cada node. Tenemos que hacer obj.value.split("-")
+            (De eso se encargan los formatters luego en el GraphGenerator())
+           
+     
+
+generate_shortPath:
+    -Es una funcion que al igual que GraphGenerator(), se encuentra en generators.js
+    -Se encarga de lidiar con todo lo de encontrar el shortest_path
+    
+    -Lo pusimos en este archivo porque tambien usa cosas de  la carpeta GraphGenerator_tools.
+        -Ahi tiene los algortimos, su formatter.     
+     

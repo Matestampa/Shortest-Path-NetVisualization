@@ -63,7 +63,7 @@ export class RandGraphData_Generator{
                     created_nodes.push(node.get_data());
             })
         }
-        console.log(`Nodes created:${created_nodes.length}`);
+        
         return created_nodes;
     }
 

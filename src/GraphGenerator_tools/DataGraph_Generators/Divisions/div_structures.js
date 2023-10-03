@@ -1,6 +1,7 @@
 //DivisionsGraph
 //Division_GraphNode
-import { PriorQueue } from "./extras.js";
+import { PriorQueue } from "../../../utils/pQueue.js";
+import { Graph , Node } from "../../../utils/graph_base.js";
 
 export class DivisionsGraph extends Graph{
     constructor(){

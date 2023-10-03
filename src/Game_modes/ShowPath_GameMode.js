@@ -32,10 +32,9 @@ let HTML=`<div style="text-align:center">
 //---------------- funciones asocidadas al html ----------------------
 //Todas deben recibir el GameMode Class.
 const functions={"generate":(GameMode)=>{
-    console.log(document.getElementById("nodes").value);
-    console.log(document.getElementById("conex").value);
     let nodes=parseInt(document.getElementById("nodes").value);
     let conex=parseInt(document.getElementById("conex").value);
+    
     GameMode.generate(nodes,conex,"aligned");},
     "select_start":(GameMode)=>{
         GameMode.allowSelect_startNode();},

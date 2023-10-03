@@ -1,5 +1,6 @@
 //import Graph
 import { Dijkstra,A_Star } from "./path_algorithms.js";
+import {Graph,Node} from "../../utils/graph_base.js";
 
 class Coord_Node extends Node{
     constructor(value,x,y){

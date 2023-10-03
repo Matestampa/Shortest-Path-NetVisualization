@@ -1,4 +1,7 @@
+import "./styles.css";
+
 import { ShowPath_GameMode } from "./Game_modes/ShowPath_GameMode.js";
+import {fabric} from "fabric";
 
 
 //-------------------- Posicionamiento de Canvas ----------------------

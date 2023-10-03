@@ -1,0 +1,32 @@
+name: Deploy to Gh Pages
+
+on:
+  workflow_dispatch: #lo hacemos manual desde github
+
+permissions: 
+  contents: write #para que funcione la action de "JamesIves/github-pages-deploy-action@v4"
+
+jobs:
+
+  deploy-to-ghPages:
+    runs-on: ubuntu-22.04
+    steps:
+      
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      
+      #- uses: actions/setup-node@v2 #no la necesitamos ya que justo la de checkout instala
+                                     #node,npm ,typescript y todo lo basico.
+      
+      - name: Install dependencies
+        run : npm ci
+      
+      - name: Build #webpack hace el bundle y genera la carpeta dist
+        run: npm run build 
+      
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: ./dist #que carpeta debe tomar, para mandarla a la branch de deploy

@@ -1,4 +1,4 @@
-class PriorQueue{
+export class PriorQueue{
    constructor(){
       this.data={}; //aca van los objetos que mandemos
       this.list=[];

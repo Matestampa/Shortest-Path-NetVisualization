@@ -1,4 +1,6 @@
 //Priority Queue adaptado para ShortPath
+import { PriorQueue } from "../../utils/pQueue.js";
+
 class ShortPath_pQueue extends PriorQueue{
     constructor(){
         super();

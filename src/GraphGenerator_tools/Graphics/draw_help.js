@@ -1,3 +1,5 @@
+import {fabric} from "fabric";
+
 class GraphDraw_Element{
     constructor(value,object_data){
         this.type="cada uno pone el suyo";

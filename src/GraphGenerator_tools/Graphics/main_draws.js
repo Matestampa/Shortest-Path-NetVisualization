@@ -1,5 +1,6 @@
 import {GraphDraw_Node,GraphDraw_Edge,GraphDraw_Division} from "./draw_help.js";
 
+
 //Permite guardar elementos que pertenezcan a varios grupos
 //Se los busca segun sus tags(grupos a los que pertenecen)
 //los elementos en concreto los guardamos en un array

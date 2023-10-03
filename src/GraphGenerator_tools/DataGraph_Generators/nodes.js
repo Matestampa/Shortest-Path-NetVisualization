@@ -1,3 +1,5 @@
+import {Node} from "../../utils/graph_base.js"
+
 class RandNode extends Node{
     constructor(value){
       super(value);

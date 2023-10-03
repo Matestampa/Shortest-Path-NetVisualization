@@ -19,7 +19,7 @@ export class GraphGenerator{
     constructor(type,area_limits,draw_data){
       
       let area_size={"width":area_limits.x[1]-area_limits.x[0],"height":area_limits.y[1]-area_limits.y[0]};
-      this.min_dist=30;
+      this.min_dist=30; //fijamos esta minima distanica entre nodes
       
       this.node_size=get_nodeSize(area_size,420,this.min_dist);
       

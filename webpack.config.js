@@ -1,11 +1,15 @@
 //En este caso es un proyecto frontend con typescript
 
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const path = require('path');
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import path from "path";
 
+import { fileURLToPath } from 'url';
 
-module.exports = {
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = path.dirname(__filename);
+
+export default{
   entry: './src/index.js', //archivo base para hacer el bundler
   
   plugins: [ //plugins para añadir funcionalidad extra
@@ -27,12 +31,20 @@ module.exports = {
         MiniCssExtractPlugin.loader, // instead of style-loader
         'css-loader'
        ],
+     },
+     {
+      test: /\.ts?$/, //en este caso esta es para typescript
+      use: 'ts-loader', //debemos tener previamente instalado el loader
+      exclude: /node_modules/,
      }
     ],
   },
   
   resolve: { 
-    extensions: ['.js'] //que archivos y en que orden deberia tener en cuenta
+    extensions: ['.ts','.js'], //que archivos y en que orden deberia tener en cuenta
+    extensionAlias: { //
+      '.js': ['.js', '.ts'],
+    }
 
   },
   

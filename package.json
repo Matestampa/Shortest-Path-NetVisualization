@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --mode=production"
+    "start": "tsc --build",
+    "build": "webpack --mode=development"
   },
   "repository": {
     "type": "git",
@@ -19,7 +20,8 @@
   },
   "homepage": "https://github.com/Matestampa/Net-Shortst-Path-Visualization#readme",
   "dependencies": {
-    "fabric": "^5.3.0"
+    "fabric": "^5.3.0",
+    "ts-loader": "^9.5.1"
   },
   "devDependencies": {
     "css-loader": "^6.8.1",

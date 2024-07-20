@@ -1,11 +1,13 @@
 import {PriorQueue} from "../../../utils/pQueue.js";
+import {DataEdge} from "../../graphData_classes.js"
+
 
 function get_distance(node1,node2){
     return Math.sqrt((node2.x_cor-node1.x_cor)**2 + (node2.y_cor-node1.y_cor)**2);
 }
 
 //----------------------- Conection de nodes dentro de una Division------------------------------------------------
-export function makeInsideDiv_conex(div,nodes,conex_x_node,maxDist_condition,node_size){
+export function makeInsideDiv_conex(div,nodes,conex_x_node,maxDist_condition,node_size):DataEdge[]{
     let num_connections={};
     let max_connections={};
     let new_edges=[];
@@ -43,10 +45,14 @@ export function makeInsideDiv_conex(div,nodes,conex_x_node,maxDist_condition,nod
                     num_connections[node.value]++;
                     num_connections[min.obj.value]++;
                     
-                    let edge_value=`${node.value}-${min.obj.value}`
-                    new_edges.push({"type":"edge","value":edge_value,"height":min.cant});
+                    /*let edge_value=`${node.value}-${min.obj.value}`
+                    new_edges.push({"type":"edge","value":edge_value,"height":min.cant});*/
+                    let node1=node;
+                    let node2=min.obj;
+
+                    new_edges.push(new DataEdge(node1.x_cor,node1.y_cor,node2.x_cor,node2.y_cor,min.cant))
                     
-                    div.add_edge(node.value,min.obj.value,min.cant);
+                    div.add_edge(node1.value,node2.value,min.cant);
                     }
                 }
                 
@@ -61,7 +67,7 @@ export function makeInsideDiv_conex(div,nodes,conex_x_node,maxDist_condition,nod
 }
 
 //---------------------------- Conection de Nodes entre Divisions --------------------------
-export function makeInterDiv_conex(DivGraph,div,cant_conex,node_size,isValid_condition){
+export function makeInterDiv_conex(DivGraph,div,cant_conex,node_size,isValid_condition):DataEdge[]{
     let new_edges=[];
    
     for (let direc of Object.keys(div.possible_neighs)){
@@ -115,8 +121,11 @@ export function makeInterDiv_conex(DivGraph,div,cant_conex,node_size,isValid_con
                 }
             
                 //hacemos el edge
-                let edge_value=`${node.value}-${nearest_node.value}`;
-                new_edges.push({"type":"edge","value":edge_value,"height":dist});
+                /*let edge_value=`${node.value}-${nearest_node.value}`;
+                new_edges.push({"type":"edge","value":edge_value,"height":dist});*/
+                let node1=node;
+                let node2=nearest_node;
+                new_edges.push(new DataEdge(node1.x_cor,node1.y_cor,node2.x_cor,node2.y_cor,dist))
                 
                 //añadimos edge al DivisionsGraph
                 DivGraph.add_edge(div.value,divNeigh.value,dist);

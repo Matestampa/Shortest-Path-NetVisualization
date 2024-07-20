@@ -1,4 +1,18 @@
-export class PriorQueue{
+
+type Pqueue_dataType={
+   [key:string]:object;
+}
+
+type Pqueue_indexesType={
+   [key:string]:number;
+}
+
+class PriorQueue{
+   data:Pqueue_dataType;
+   list:{id:any,cant:number}[];
+   indexes:Pqueue_indexesType;
+   currId:number;
+
    constructor(){
       this.data={}; //aca van los objetos que mandemos
       this.list=[];
@@ -7,7 +21,7 @@ export class PriorQueue{
       this.currId=0;
    }
 
-   add(obj,cant,key){
+   add(obj:any,cant:number,key?:string){
       if (key){
          this.data[key]=obj;
          this.list.push({id:key,cant:cant});
@@ -25,7 +39,7 @@ export class PriorQueue{
 
    }
 
-   update(obj,cant,key){
+   update(obj:any,cant:number,key:string){
       if (this.data[key]==undefined){throw Error(`The element ${key} is not in the Pqueue`)};
       
       let toUpdate_index=this.indexes[key];
@@ -35,7 +49,7 @@ export class PriorQueue{
       this.__re_order(toUpdate_index);
    }
    
-   pop_from(option="end"){
+   pop_from(option:("start"|"medium"|"end") = "end"){
       if (this.list.length==0){throw new Error("The queue is empty")};
       if (this.list.length==1 && option=="medium"){option="end"}; //si es medium y solo hay uno nos va a dar error de index
       
@@ -54,7 +68,7 @@ export class PriorQueue{
       return objReturned;
 
    }
-   is_empty(){
+   is_empty():boolean{
       if (this.list.length==0){
          return true;
       }
@@ -66,11 +80,11 @@ export class PriorQueue{
       console.log(this.list);
    }
 
-   __re_order(from_index=undefined){
+   __re_order(from_index?:number){
       let start;
       let end;
       let indexMove;
-      let condition;
+      let condition:(curr:number,next:number)=>boolean;
       
       if (from_index!=undefined && from_index!=this.list.length-1){
          start=from_index;
@@ -116,3 +130,5 @@ export class PriorQueue{
       }
    }
 }
+
+export {PriorQueue};

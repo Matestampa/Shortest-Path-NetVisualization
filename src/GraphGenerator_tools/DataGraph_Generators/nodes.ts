@@ -78,8 +78,8 @@ export class RandNode_Generator{
   
     }
     __create_node(){
-      let coords_x=Math.ceil(Math.random()*(this.range_x[1]-this.range_x[0])+this.range_x[0]);
-      let coords_y=Math.ceil(Math.random()*(this.range_y[1]-this.range_y[0])+this.range_y[0]);
+      let coords_x=Math.floor(Math.random()*(this.range_x[1]-this.range_x[0])+this.range_x[0]);
+      let coords_y=Math.floor(Math.random()*(this.range_y[1]-this.range_y[0])+this.range_y[0]);
 
       //let value=`${coords_x},${coords_y}`
       let new_node=new RandNode("",coords_x,coords_y);
@@ -106,3 +106,5 @@ export class RandNode_Generator{
       return valid;
     }
 }
+
+export type {RandNode};

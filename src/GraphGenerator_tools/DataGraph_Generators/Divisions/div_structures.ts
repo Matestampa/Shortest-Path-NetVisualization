@@ -3,9 +3,16 @@
 import { PriorQueue } from "../../../utils/pQueue.js";
 import { Graph , Node } from "../../../utils/graph_base.js";
 
-export class DivisionsGraph extends Graph{
+import type { RandNode } from "../nodes.js";
+import type { _2DCoords_Type } from "../types.js";
+
+class DivisionsGraph extends Graph{
     constructor(){
         super();
+    }
+
+    get_node(value:string):Division_NodeAndGraph{
+        return super.get_node(value) as Division_NodeAndGraph;
     }
     
     add_div(new_div){
@@ -13,21 +20,39 @@ export class DivisionsGraph extends Graph{
     }
 }
 
-export class Division_NodeAndGraph extends Node{
-    constructor(value,coords,cant_nodes,dist,possible_neighs){
-        super(value,coords,cant_nodes,possible_neighs);
+
+class Division_NodeAndGraph extends Node{
+    value:string;
+    coords:_2DCoords_Type;
+    possible_neighs:{};
+    opositeSides_toConnect:{}
+
+    cant_nodes:number;
+    curr_nodes:number;
+    max_dist:number;
+    Graph:DivisionGraph;
+    side_nodes:{ [key:string] : RandNode[] };
+    available_nodes:{ [key:string] : RandNode[] };
+
+    constructor(value:string,coords:_2DCoords_Type,cant_nodes:number,dist:number){
+        super(value);
         //---------- Attrs Node -----------------------
         this.coords=coords; //este de ambos ponele
-        this.possible_neighs=possible_neighs;
-        this.opositeSides_toConnect;
+        this.possible_neighs={};
+        this.opositeSides_toConnect={};
         
         //---------- Attrs Graph ------------------------
         this.cant_nodes=cant_nodes;
         this.curr_nodes=0;
         this.max_dist=dist;
         this.Graph=new DivisionGraph();
-        this.side_nodes={}; //Para usarlos nosotros {"direc":Arr}
-        this.available_nodes={}; //Para que los usen los vecinos {"opositeDirec":Arr}
+
+        this.side_nodes={}; //Los nodes q tenemos para conectar 
+                            //con otra div en una direc {"direc":Arr}
+        this.available_nodes={};//Los mismos nodes pero con la direc 
+                                //opuesta para q la otra div pueda conectarse
+                                //primero si quiere {"opositeDirec":Arr}
+    
     }
     
     //------------------------ Funciones de Node ----------------------------------
@@ -35,8 +60,10 @@ export class Division_NodeAndGraph extends Node{
         return {"type":"division","value":this.value,"coords":this.coords};
     }
     
-    //Elige los nodes mas cercanos, a cada una de sus divs vecinas
-    make_sideNodes(cant_x_side){
+    //Elige los nodes mas cercanos, a cada una de sus divs vecinas.
+    //Genera this.side_nodes;
+    //Genera this.available_nodes
+    make_sideNodes(cant_x_side:number){
         const opposite_sides=this.opositeSides_toConnect;
         
         for (let side of Object.keys(this.possible_neighs)){
@@ -85,8 +112,8 @@ export class Division_NodeAndGraph extends Node{
 
 
     //------------------------ Funciones de Graph --------------------------------
-    add_node(new_node){
-        this.Graph.add_node(new_node);
+    add_node(new_node:RandNode){
+        this.Graph.add_node(new_node.value,new_node);
         this.curr_nodes++;
     }
     add_edge(nodeVal1,nodeVal2,height){
@@ -107,11 +134,13 @@ class DivisionGraph extends Graph{
         super();
     }
 
-    add_node(new_node){
-        super.add_node(new_node.value,new_node);
+    add_node(value:string,new_node:RandNode){
+        super.add_node(value,new_node);
     }
 
-    get_nodes(){
-        return Object.values(this.nodes);
+    get_nodes():RandNode[]{
+        return Object.values(this.nodes) as RandNode[];
     }
 }
+
+export {DivisionsGraph,Division_NodeAndGraph}

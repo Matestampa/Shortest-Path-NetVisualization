@@ -1,26 +1,45 @@
 import {Division_NodeAndGraph} from "./div_structures.js";
+import type { _2DCoords_Type } from "../types.js";
 
 //------------------- Utilities functions --------------------------------------
 
 function get_maxCantNodes(screen={"width":150,"height":150},nodeSize=20,max_dist=30){
-    let mid_nodeSize=parseInt(nodeSize/2);
+    let mid_nodeSize=Math.floor(nodeSize/2);
     let cant_nodes=(screen.width*screen.height) / (Math.PI * (mid_nodeSize+(max_dist/2))**2);
 
     return Math.round(cant_nodes);
 }
 
 function get_maxDist(screen={"width":324,"height":324},node_size=20,cant_nodes=10){
-    let mid_nodeSize=parseInt(node_size/2);
+    let mid_nodeSize=Math.floor(node_size/2);
     let max_dist=Math.sqrt(((screen.width*screen.height)/ cant_nodes)/ Math.PI) - mid_nodeSize;
 
-    return parseInt(max_dist*2);
+    return Math.floor(max_dist*2);
 }
 
-
 //---------- Clase Base -------------------------
-class DivisionsGenerator{
-    //({"x":[num,num],"y":[num,num]}, num, num, num, num(dist entre divs), num(dist tope para que quepa un node))
-    constructor(totalArea_limits,nodes_x_div,total_nodes,node_size,max_dist){
+
+
+
+//Type de la funcion de interconex condition, q debe devolver el generator
+type interConex_CondFuncType=(dist,divOrigin,divDest,cant_conex,node_size)=>boolean;
+
+abstract class DivisionsGenerator{
+    limit_x1:number
+    limit_x2:number
+    limit_y1:number
+    limit_y2:number
+
+    nodes_x_div:number;
+    total_nodes:number;
+    node_size:number;
+    div_dist:number; //dist entre divs
+    max_dist:number; //dist tope para que quepa un node
+
+
+    constructor(totalArea_limits:_2DCoords_Type,nodes_x_div,
+               total_nodes,node_size,max_dist){
+        
         [this.limit_x1,this.limit_x2]=[totalArea_limits.x[0],totalArea_limits.x[1]];
         [this.limit_y1,this.limit_y2]=[totalArea_limits.y[0],totalArea_limits.y[1]];
 
@@ -50,8 +69,10 @@ class DivisionsGenerator{
 
     }
     
-    //si o si debe usarlo el p_generate de cualquier clase
-    __make_div(value,coords,toPut_nodes){ //return (string,{"x":[num,num],"y":[num,num]},num)
+    //Si o si debe usarlo el p_generate de cualquier clase
+    __make_div(value:string,coords:_2DCoords_Type,
+              toPut_nodes:number):{"obj":Division_NodeAndGraph,"cant_nodes":number}{ 
+        
         let div_width=Math.abs(coords.x[1]-coords.x[0]);
         let div_height=Math.abs(coords.y[1]-coords.y[0]);
         let cant_nodes;
@@ -61,7 +82,7 @@ class DivisionsGenerator{
         let maxNodes=get_maxCantNodes({"width":div_width,"height":div_height},this.node_size,this.max_dist);
        
         if (maxNodes<=toPut_nodes){ //si entran menos o igual de los que se necesitan
-            if (maxNodes<=1){ return {"div":undefined,"cantNodes":0} } //si entran <=1 no es valida la div
+            if (maxNodes<=1){ return {"obj":undefined,"cant_nodes":0} } //si entran <=1 no es valida la div
            
             cant_nodes=maxNodes;
             max_dist=this.max_dist;
@@ -74,39 +95,57 @@ class DivisionsGenerator{
         
         let div_obj=new Division_NodeAndGraph(value,coords,cant_nodes,max_dist); //creamos una nueva div Instance
 
-        return {"obj":div_obj,"cantNodes":cant_nodes};
+        return {"obj":div_obj,"cant_nodes":cant_nodes};
 
     }
     
     //------------------ Personalizadas y obligatorias de c/u -------------------
-    p_generate(){
-        //debe retornar un Array<Division_NodeandGraph>
-    }
+    abstract p_generate():Division_NodeAndGraph[];
 
-    p_make_neighs(){
-        //debe retornar un object {side:divNeigh_value,......} por cada Division
-    }
-    p_get_opositeSides(){
-        //debe retornar un object {side:su opuesto,......} por cada Division
-        //Sirve para que luego la div y el proceso de interConex determinen que nodes se conectan
-    }
+    abstract p_make_neighs(div:Division_NodeAndGraph):{[key:string]:string}
+        //debe retornar un object {side:divNeigh_value,otroSide:divNeighVal} por cada Division
+    
+    abstract p_get_opositeSides():{[key:string]:string}
+    //debe retornar un object {side:su opuesto,......} por cada Division
+    //Sirve para que luego la div y el proceso de interConex determinen que nodes se conectan
 
-    p_get_interConex_condition(){
-        //debe retornar un callback que tenga si o si los argumentos (dist,divOrigin,divDest,cant_conex,node_size)
+    abstract p_get_interConex_condition():interConex_CondFuncType
+        //debe retornar un callback que tenga si o si los argumentos (dist,divOrigin,divDest,cant_conex,node size)
         //el mismo debe contener dentro una condicion y ,retornar true(si se cumple) o false(si no se cumple)
-    }
 }
 
 //--------------- Clases individuales ----------------------------
 
-export class AlignedRandom_DivisionsGenerator extends DivisionsGenerator{
-    constructor(totalArea_limits,nodes_x_div,total_nodes,node_size,max_dist){        
+//Types de params q usa "AlignedRandom" para direccionar la generacion de divs
+type generationDirec_params={
+    "limit_x1":number,"limit_y1":number,"limit_x2":number,"limit_y2":number,
+    "direction_x":1|-1,"direction_y":1|-1
+}
+
+
+class AlignedRandom_DivisionsGenerator extends DivisionsGenerator{
+    
+    div_size:{"width":number,"height":number};
+    opositeSides:{};
+    interConex_cond:interConex_CondFuncType;
+
+    generated_divValues:{}
+    params:generationDirec_params
+
+
+    constructor(totalArea_limits:_2DCoords_Type,nodes_x_div,
+                total_nodes,node_size,max_dist){        
+        
         super(totalArea_limits,nodes_x_div,total_nodes,node_size,max_dist)
         
         this.div_size=this.__calc_divSize(totalArea_limits,nodes_x_div,total_nodes,this.div_dist,max_dist);
         
+        //---------------- Props a retornar ------------------------------------
+
+        //Se definen los opposite sides de este generator
         this.opositeSides={"left":"right","right":"left","top":"down","down":"top"};
         
+        //Se define la func de interconex condition de este generator
         this.interConex_cond=(dist,divOrigin,divDest,cant_conex,node_size)=>{
             let condition=cant_conex * (divOrigin.max_dist+20+divDest.max_dist)/3;
             
@@ -117,8 +156,7 @@ export class AlignedRandom_DivisionsGenerator extends DivisionsGenerator{
         
     }
     
-    //Se puede hacer individual de cada generator
-    p_generate(){
+    p_generate():Division_NodeAndGraph[]{
         let generated_divs=[];
         let extra_divs=[];
         let restant_nodes=this.total_nodes; //los que nos quedan por meter
@@ -128,7 +166,7 @@ export class AlignedRandom_DivisionsGenerator extends DivisionsGenerator{
         //eleccion random del punto de inicio de generacion
         let options=["topLeft","topRight","bottomLeft","bottomRight"];
 
-        let option_selected=options[parseInt(Math.random()*options.length)];
+        let option_selected=options[Math.floor(Math.random()*options.length)];
     
         let params=this.__get_params(option_selected); //nos dan lo necesario para que funcione en cada caso.
         
@@ -206,8 +244,8 @@ export class AlignedRandom_DivisionsGenerator extends DivisionsGenerator{
             }
 
             //Pasar las coords a enteros
-            [x1,x2]=[parseInt(x1),parseInt(x2)];
-            [y1,y2]=[parseInt(y1),parseInt(y2)];
+            [x1,x2]=[Math.floor(x1),Math.floor(x2)];
+            [y1,y2]=[Math.floor(y1),Math.floor(y2)];
             
             //############ PARTE DE NODES CHECK Y MAKE DIV################################
             //------------ chequear nodes suficientes -----------------
@@ -227,7 +265,7 @@ export class AlignedRandom_DivisionsGenerator extends DivisionsGenerator{
             if (new_div.obj){ //si se hizo una div valida
                 if (restant_nodes>=1){
                     generated_divs.push(new_div.obj);
-                    restant_nodes-=new_div.cantNodes; //le restamos a los nodes que nos quedan
+                    restant_nodes-=new_div.cant_nodes; //le restamos a los nodes que nos quedan
                 }
                 else{
                     extra_divs.push(new_div.obj);
@@ -266,25 +304,27 @@ export class AlignedRandom_DivisionsGenerator extends DivisionsGenerator{
         return generated_divs;
     }
     
-    p_make_neighs(div){
+    p_make_neighs(div:Division_NodeAndGraph):{[key:string]:string}{
         return this.__get_neighs(div.value,this.params.direction_x,this.params.direction_y);
     }
 
-    p_get_opositeSides(){
+    p_get_opositeSides():{[key:string]:string}{
         return this.opositeSides;
     }
 
-    p_get_interConex_condition(){
+    p_get_interConex_condition():interConex_CondFuncType{
         return this.interConex_cond;
     }
     
     //----------------- Privadas propias -------------------------------------------
-    __calc_divSize(totalLimits,nodes_x_div,total_nodes,div_dist,min_dist){
+    private __calc_divSize(totalLimits,nodes_x_div,total_nodes,
+                          div_dist,min_dist):{"width":number,"height":number}{
+        
         let total_size={"width":totalLimits.x[1]-totalLimits.x[0],"height":totalLimits.y[1]-totalLimits.y[0]};
         
         let cant_divs=Math.ceil(total_nodes/nodes_x_div);
         
-        let initial_divSize=parseInt(Math.sqrt((total_size.width*total_size.height)/(cant_divs)));
+        let initial_divSize=Math.floor(Math.sqrt((total_size.width*total_size.height)/(cant_divs)));
         
         let div_size={"width":initial_divSize,"height":initial_divSize}
     
@@ -293,9 +333,9 @@ export class AlignedRandom_DivisionsGenerator extends DivisionsGenerator{
     
         let cantWidth_divs=Math.ceil(side_cant);
         if (side_cant>cant_divs){
-           side_cant=parseInt(side_cant);
+           side_cant=Math.floor(side_cant);
            let toModule=(side_cant*div_size.width+(side_cant-1)*div_dist);
-           let toAgregate=parseInt(total_size.width%toModule)/side_cant;
+           let toAgregate=Math.floor(total_size.width%toModule)/side_cant;
            cantWidth_divs-=1;
            div_size.width+=toAgregate;
         }
@@ -305,17 +345,19 @@ export class AlignedRandom_DivisionsGenerator extends DivisionsGenerator{
         let cantHeight_divs=Math.ceil(cant_divs/cantWidth_divs);
     
         if (side_cant>cantHeight_divs){
-           side_cant=parseInt(side_cant);
+           side_cant=Math.floor(side_cant);
            let toModule=(side_cant*div_size.height+(side_cant-1)*div_dist);
-           let toAgregate=parseInt(total_size.height%toModule)/side_cant;
+           let toAgregate=Math.floor(total_size.height%toModule)/side_cant;
     
            div_size.height+=toAgregate;
         }
 
         return div_size;
     }
-
-    __get_params(option="topLeft"){
+    
+    //Obtener params de generationDirec, segun por q parte se quiera empezar 
+    //a generar (option)
+    private __get_params(option="topLeft"):generationDirec_params{
       let topLeft={"limit_x1":this.limit_x1,"limit_y1":this.limit_y1,"limit_x2":this.limit_x2,"limit_y2":this.limit_y2,
                    "direction_x":1,"direction_y":1};
       
@@ -333,7 +375,7 @@ export class AlignedRandom_DivisionsGenerator extends DivisionsGenerator{
       return params[option];
     }
 
-    __order_coords(coord1,coord2){
+    private __order_coords(coord1:number,coord2:number):[number,number]{
         if (coord1<coord2){
             return [coord1,coord2];
         }
@@ -341,15 +383,17 @@ export class AlignedRandom_DivisionsGenerator extends DivisionsGenerator{
             return [coord2,coord1];
         }
     }
+    
+    //Obtener neigh de cada direccion de una div
+    private __get_neighs(value,direc_x,direc_y):{[key:string]:string}{ 
 
-    __get_neighs(value,direc_x,direc_y){ //(string) 
         let directions={"left":{"move":"column","cant":direc_x*(-1)},
                         "right":{"move":"column","cant":direc_x},
                         "top":{"move":"row","cant":direc_y*(-1)},
                         "down":{"move":"row","cant":direc_y}};
         
         let [initValue_row,initValue_column]=value.split(",");
-        [initValue_row,initValue_column]=[parseInt(initValue_row),parseInt(initValue_column)]
+        [initValue_row,initValue_column]=[Math.floor(initValue_row),Math.floor(initValue_column)]
         
         let neighs={};
         for (let direc of Object.keys(directions)){
@@ -370,3 +414,7 @@ export class AlignedRandom_DivisionsGenerator extends DivisionsGenerator{
         return neighs;
     }
 }
+
+export {AlignedRandom_DivisionsGenerator};
+export type{interConex_CondFuncType};
+export {DivisionsGenerator};

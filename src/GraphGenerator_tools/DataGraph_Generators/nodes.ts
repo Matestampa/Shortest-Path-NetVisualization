@@ -15,9 +15,9 @@ class RandNode extends Node{
       if (this.x_cor<0 || this.y_cor<0){console.log(`negativo ${value}`)};
     }
 
-    get_data(){
+    /*get_data(){
       return {"type":"node","value":this.value}
-    }
+    }*/
 
     //el get_distance debe hacerlo otra entidad
 }

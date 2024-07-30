@@ -19,6 +19,7 @@ class DataEdge{
     y_cor1:number
     x_cor2:number
     y_cor2:number
+    height:number
 
     constructor(x_cor1:number,y_cor1:number,x_cor2:number,y_cor2:number,height:number){
         this.value=`${x_cor1},${y_cor1}-${x_cor2},${y_cor2}`
@@ -26,8 +27,19 @@ class DataEdge{
         this.y_cor1=y_cor1;
         this.x_cor2=x_cor2;
         this.y_cor2=y_cor2;
+        this.height=height;
 
     }
+
+    get_invertedValue(){
+        let components=this.value.split("-");
+        return `${components[1]}-${components[0]}`;
+    }
 }
+
+let edge=new DataEdge(40,20,50,60,5)
+
+console.log(edge.value);
+console.log(edge.get_invertedValue());
 
 export {GeneratedGraphData,DataNode,DataEdge};

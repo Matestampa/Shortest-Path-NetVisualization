@@ -2,7 +2,7 @@ import {RandGraphData_Generator} from "./GraphGenerator_tools/DataGraph_Generato
 import { InMemory_Graph } from "./GraphGenerator_tools/Graph_functionality/InMemory_Graph.js";
 import {GraphDraw_Manager} from "./GraphGenerator_tools/Graphics/main_draws.js";
 import { get_nodeSize } from "./GraphGenerator_tools/params_functions.js";
-import {fromGraph_2_draw,fromPath_2_Draw} from "./GraphGenerator_tools/formaters.js";
+import {fromPath_2_Draw} from "./GraphGenerator_tools/formaters.js";
 
 import { Dijkstra,A_Star } from "./GraphGenerator_tools/Graph_functionality/path_algorithms.js";
 
@@ -51,10 +51,8 @@ export class GraphGenerator{
       this.inMemoryGraph=new InMemory_Graph()
       this.inMemoryGraph.build_from(data);
       
-      //formatear la data para el DrawGraph
-      let formatted_data=fromGraph_2_draw(data);
       //renderizar el Draw con eso
-      this.DrawGraph.render_from(formatted_data);
+      this.DrawGraph.render_from(data);
       
       return [this.inMemoryGraph,this.DrawGraph];
     }

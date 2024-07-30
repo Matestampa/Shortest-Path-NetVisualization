@@ -1,5 +1,6 @@
 import {GraphDraw_Node,GraphDraw_Edge,GraphDraw_Division} from "./draw_help.js";
 
+import { DataNode,DataEdge } from "../graphData_classes.js";
 
 //Permite guardar elementos que pertenezcan a varios grupos
 //Se los busca segun sus tags(grupos a los que pertenecen)
@@ -83,11 +84,11 @@ export class GraphDraw_Manager{
 
     render_from(objects){
       objects.forEach((object)=>{
-        if (object.type=="node"){
+        if (object instanceof DataNode){
             this.create_node(object);
         }
         
-        if (object.type=="edge"){
+        if (object instanceof DataEdge){
             this.create_edge(object);
         }
 
@@ -112,6 +113,11 @@ export class GraphDraw_Manager{
                                       "lockMovementX":this.node_movility,"lockMovementY":this.node_movility};
         
         let new_node=new GraphDraw_Node(node.value,object_data);
+
+        //poner tags
+        node["tags"]=["nodes",node.value];
+
+        //guardar
         this.__save(node,new_node);
     }
 
@@ -128,6 +134,11 @@ export class GraphDraw_Manager{
                                   "lockMovementX":this.edge_movility,"lockMovementY":this.edge_movility,"strokeWidth":2}};
         
         let new_edge=new GraphDraw_Edge(edge.value,object_data);
+
+        //Poner tags
+        edge["tags"]=["edges",edge.value,edge.get_invertedValue()];
+
+        //Guardar
         this.__save(edge,new_edge);
     }
     
@@ -196,6 +207,7 @@ export class GraphDraw_Manager{
     __save(object,new_element){ //guarda en canvas y en objects
       this.cv.add(new_element.cv_object);
       if (object.tags){
+          console.log(object.tags);
           object.tags.push("all");
           this.objects.add(object.tags,new_element);
       }

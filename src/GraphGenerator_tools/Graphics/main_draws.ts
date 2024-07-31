@@ -1,12 +1,21 @@
-import {GraphDraw_Node,GraphDraw_Edge,GraphDraw_Division} from "./draw_help.js";
+import {fabric} from "fabric";
 
-import { DataNode,DataEdge } from "../graphData_classes.js";
+import {DataNode,DataEdge } from "../graphData_classes.js";
+import type { GeneratedGraphData } from "../graphData_classes.js";
+
+import {GraphDraw_Node,GraphDraw_Edge} from "./draw_help.js";
+
 
 //Permite guardar elementos que pertenezcan a varios grupos
 //Se los busca segun sus tags(grupos a los que pertenecen)
 //los elementos en concreto los guardamos en un array
 //cada una de las tags que haya es un array que contiene los index de los elementos que le pertenecen
 class TagGroups{
+    tags:{}
+    objs:any[]
+    curr_index:number
+    length:number  
+
     constructor(){
       this.tags={}; //guardamos sus indices en cada tag --->{tag:[index0,index4,indexN]}
       this.objs=[]; //guardamos los elementos
@@ -15,7 +24,7 @@ class TagGroups{
       this.length=0;
     }
 
-    add(tags,obj){
+    add(tags:any[],obj){
       for (let key of tags){
           if (this.tags[key]==undefined){ //si no existe la creamos
             this.tags[key]=[];
@@ -28,7 +37,7 @@ class TagGroups{
       this.length+=1;
     }
 
-    get(tags){
+    get(tags:any[]):any[]{
       let matched_objs=[];
       for (let key of tags){
         if (this.tags[key]!=undefined){ //si existe           
@@ -46,7 +55,7 @@ class TagGroups{
       return matched_objs; //devolvemos todo lo que encontramos
     }
 
-    remove(tags){
+    remove(tags:any[]){
       for (let key of tags){
         if (this.tags[key]!=undefined){ //si existe la tag
            for (let index of this.tags[key]){
@@ -68,13 +77,23 @@ class TagGroups{
 
 //Encargada de crear ,almacenar y manejar objetos graficos
 //tambien administrat sus eventos y cambiarles ciertos atributos.
-export class GraphDraw_Manager{
-    constructor(canvas,node_config,edge_config){ //canvasObj, node{"size","default_color","movility"}, edge{"default_color","movility"}
+class GraphDraw_Manager{
+    
+    cv:fabric.Canvas
+    objects:TagGroups
+    node_size:number
+    DEFAULT_NODE_COLOR:string
+    node_movility:boolean
+    DEAFULT_EDGE_COLOR:string
+    edge_movility:boolean
+
+
+    constructor(canvas:fabric.Canvas,node_config,edge_config){ //canvasObj, node{"size","default_color","movility"}, edge{"default_color","movility"}
         this.cv=canvas;
         this.objects=new TagGroups();
         
         this.node_size=node_config.size;
-        this.DEAFULT_NODE_COLOR=node_config.default_color;
+        this.DEFAULT_NODE_COLOR=node_config.default_color;
         this.node_movility=!node_config.movility; //lo invertimos(porque los attrs del fabric son para bloquear movimiento)
                                                   //(osea si en movility ponemos false, en fabric hay que poner "true"
                                                   // de bloquear movimiento)
@@ -82,7 +101,7 @@ export class GraphDraw_Manager{
         this.edge_movility=!edge_config.movility; //aca lo mismo para el edge
     }
 
-    render_from(objects){
+    render_from(objects:GeneratedGraphData){
       objects.forEach((object)=>{
         if (object instanceof DataNode){
             this.create_node(object);
@@ -92,21 +111,16 @@ export class GraphDraw_Manager{
             this.create_edge(object);
         }
 
-        if (object.type=="division"){
+        /*if (object.type=="division"){
           this.create_division(object);
-      }
+      }*/
 
       })
     }
 
-    create_node(node){
-        let color;
-        if (node.color){
-          color=node.color
-        }
-        else{
-          color=this.DEAFULT_NODE_COLOR
-        }
+    create_node(node:DataNode){
+        let color=this.DEFAULT_NODE_COLOR;
+
         let object_data={"left":node.x_cor-(this.node_size/2),"top":node.y_cor-(this.node_size/2),
                                       "radius":this.node_size/2,
                                       "fill":color,"hasControls":false,"hasBorders":false,"hoverCursor":"default",
@@ -121,14 +135,9 @@ export class GraphDraw_Manager{
         this.__save(node,new_node);
     }
 
-    create_edge(edge){
-      let color;
-        if (edge.color){
-          color=edge.color
-        }
-        else{
-          color=this.DEAFULT_EDGE_COLOR
-        }  
+    create_edge(edge:DataEdge){
+      let color=this.DEAFULT_EDGE_COLOR;
+
       let object_data={"coords":[edge.x_cor1,edge.y_cor1,edge.x_cor2,edge.y_cor2],
                          "attrs":{"stroke":color,"hasControls":false,"hasBorders":false,"hoverCursor":"default",
                                   "lockMovementX":this.edge_movility,"lockMovementY":this.edge_movility,"strokeWidth":2}};
@@ -151,7 +160,7 @@ export class GraphDraw_Manager{
       this.__save(div,new_div);
     }*/
 
-    remove(tags){
+    remove(tags:any[]){
       let objs_toRemove=this.objects.get(tags); //necesitamos los concrete elements, para poder borrarlos del canvas
       objs_toRemove.forEach(obj=>{
         this.cv.remove(obj.cv_object); //los borramos del canvas
@@ -159,7 +168,7 @@ export class GraphDraw_Manager{
       this.objects.remove(tags); //los borramos del TagGroup
     }
 
-    item_config(tags,property,value){
+    item_config(tags:any,property:string,value:any){
       let objs=this.objects.get(tags);
       objs.forEach(obj=>{
         if (property=="color"){ //aca se pueden agregar propiedades para el futuro
@@ -173,7 +182,7 @@ export class GraphDraw_Manager{
     
     
     //Poner evento de click
-    setClick_event(tags,callback){ 
+    setClick_event(tags:any[],callback:(obj)=>void){ 
       let objs=this.objects.get(tags);
       for (let obj of objs){
         obj.cv_object.on("selected",function(){
@@ -184,7 +193,7 @@ export class GraphDraw_Manager{
     }
     
     //Sacar evento de click
-    removeClick_event(tags){
+    removeClick_event(tags:any[]){
       let objs=this.objects.get(tags);
       for (let obj of objs){
         obj.cv_object.off("selected");
@@ -192,6 +201,7 @@ export class GraphDraw_Manager{
       }
     }
     
+    //Borrar todos los objs de la clase
     clear(){
       if (this.objects.length!=0){
         this.remove(["all"]);
@@ -203,11 +213,13 @@ export class GraphDraw_Manager{
     refresh(){
       this.cv.renderAll();
     }
-
-    __save(object,new_element){ //guarda en canvas y en objects
+    
+    //Guarda en canvas y en objects
+    private __save(object,new_element){
+      
       this.cv.add(new_element.cv_object);
+      
       if (object.tags){
-          console.log(object.tags);
           object.tags.push("all");
           this.objects.add(object.tags,new_element);
       }
@@ -217,3 +229,5 @@ export class GraphDraw_Manager{
       }
     }
 }
+
+export {GraphDraw_Manager};

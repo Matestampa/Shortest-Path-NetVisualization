@@ -1,11 +1,18 @@
 
+import type { InMemory_Graph } from "./Graph_functionality/InMemory_Graph";
+
+
+type shortestPath_drawData={
+   path:({type:"node",value:string}|{type:"edge",value:string,dist:number})[],
+   steps:({type:"node",value:string}|{type:"edge",value:string})[]
+}
 
 //Covierte data de ShortPath_Algorithm a data legible para GameMode
-function fromPath_2_Draw(Graph,pathArr,stepsArr){//return {type:"node"/"edge", value:str} y agrega dist:int en el caso de path
+function fromPath_2_Draw(Graph:InMemory_Graph,pathArr,stepsArr):shortestPath_drawData{
    let curr_dist=0;
    let edge_height;
-   let formatted_path=[];
-   let formatted_steps=[];
+   let formatted_path:shortestPath_drawData["path"];
+   let formatted_steps:shortestPath_drawData["steps"];
    
    for (let i=0;i<stepsArr.length;i++){
 
@@ -31,3 +38,4 @@ function fromPath_2_Draw(Graph,pathArr,stepsArr){//return {type:"node"/"edge", v
 }
 
 export {fromPath_2_Draw};
+export type {shortestPath_drawData};

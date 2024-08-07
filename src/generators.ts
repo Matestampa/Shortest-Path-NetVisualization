@@ -90,7 +90,7 @@ let Algorithm:ShortPath_Algorithm //para guardar la ya instanciada y que tenga l
 function generate_shortPath(Graph:InMemory_Graph,start:string,end:string,
                             algo_option="Dijkstra"):ShortestPath_Data{
   
-  ShortPath_Algo_ref=SHORT_PATH_ALGORITHMS[algo_option](Graph);
+  ShortPath_Algo_ref=SHORT_PATH_ALGORITHMS[algo_option];
   Algorithm=new ShortPath_Algo_ref(Graph);
   
   //find_path
@@ -104,3 +104,4 @@ function generate_shortPath(Graph:InMemory_Graph,start:string,end:string,
 
 export {GraphGenerator,generate_shortPath};
 export type {ShortestPath_Data};
+export type {InMemory_Graph,GraphDraw_Manager};

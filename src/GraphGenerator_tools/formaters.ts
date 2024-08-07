@@ -11,8 +11,8 @@ type shortestPath_drawData={
 function fromPath_2_Draw(Graph:InMemory_Graph,pathArr,stepsArr):shortestPath_drawData{
    let curr_dist=0;
    let edge_height;
-   let formatted_path:shortestPath_drawData["path"];
-   let formatted_steps:shortestPath_drawData["steps"];
+   let formatted_path:shortestPath_drawData["path"]=[];
+   let formatted_steps:shortestPath_drawData["steps"]=[];
    
    for (let i=0;i<stepsArr.length;i++){
 

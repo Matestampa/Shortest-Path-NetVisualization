@@ -168,7 +168,7 @@ class GraphDraw_Manager{
       this.objects.remove(tags); //los borramos del TagGroup
     }
 
-    item_config(tags:any,property:string,value:any){
+    item_config(tags:any,property:string,value?:any){
       let objs=this.objects.get(tags);
       objs.forEach(obj=>{
         if (property=="color"){ //aca se pueden agregar propiedades para el futuro

@@ -1,5 +1,7 @@
 import {Base_GameMode} from "./gameMode_base.js";
-import {Dom_Manager} from "./GameMode_tools/Dom_Manager.js";
+import {Dom_Manager,
+       INPUT_ELEMENTS_OPTIONS as INPUT_ELEMS} from "./GameMode_tools/Dom_Manager.js";
+
 import {sleep} from "./GameMode_tools/extras.js";
 
 
@@ -28,14 +30,14 @@ let HTML=`<div style="text-align:center">
 <canvas id="c"></canvas>
 </div>`
 
-
-//---------------- funciones asocidadas al html ----------------------
+//---------------- FUNCIONES ASOCIDADAS AL HTML ----------------------
 //Todas deben recibir el GameMode Class.
-const functions={"generate":(GameMode)=>{
-    let nodes=parseInt(document.getElementById("nodes").value);
-    let conex=parseInt(document.getElementById("conex").value);
+const functions={
+    "generate":(GameMode)=>{
+       let nodes=parseInt((document.getElementById("nodes") as HTMLInputElement).value);
+       let conex=parseInt((document.getElementById("conex") as HTMLInputElement).value);
+       GameMode.generate(nodes,conex,"aligned");},
     
-    GameMode.generate(nodes,conex,"aligned");},
     "select_start":(GameMode)=>{
         GameMode.allowSelect_startNode();},
     "select_end":(GameMode)=>{
@@ -44,20 +46,34 @@ const functions={"generate":(GameMode)=>{
         GameMode.allowRemove_Edge();}
     }
 
-//------------ Objetos del DOM con los que interactuamos -------------------------
+//------------ OBJETOS DEL DOM CON LOS QUE INTERACTUAMOS -------------------------
 let ObJ_Manager=new Dom_Manager();
-ObJ_Manager.set_objsData([{"id":"nodes","type":"range"},{"id":"conex","type":"range"},{"id":"algorithm","type":"select"},
-{"id":"dist","type":"text"},{"id":"show-steps","type":"checkbox"},{"id":"select_startBtn","type":"button"},
-{"id":"select_endBtn","type":"button"},{"id":"remove_edgeBtn","type":"button"}]);
+ObJ_Manager.set_objsData(
+    [
+     {"id":"nodes","type":INPUT_ELEMS.range},
+     {"id":"conex","type":INPUT_ELEMS.range},
+     {"id":"algorithm","type":INPUT_ELEMS.select},
+     {"id":"dist","type":INPUT_ELEMS.text},
+     {"id":"show-steps","type":INPUT_ELEMS.checkbox},
+     {"id":"select_startBtn","type":INPUT_ELEMS.button},
+     {"id":"select_endBtn","type":INPUT_ELEMS.button},
+     {"id":"remove_edgeBtn","type":INPUT_ELEMS.button}
+    ]
+);
 
 
-//--------------------------- clase GameMode ---------------------------------
+//--------------------------- CLASE GAMEMODE ---------------------------------
 class ShowPath_GameMode extends Base_GameMode{
+    
+    nodeSelection_clbckOpts:{start:(obj)=>void,finish:(obj)=>void}
+    nodeSelection_callback:(obj)=>void
+
+
     constructor(area_limits,Canvas,Dom_Manager){
         super(area_limits,Canvas,Dom_Manager);
         
         //Callbacks al hacer click en un Node
-        this.nodeSelection={"start":this.__select_start,"finish":this.__select_finish};
+        this.nodeSelection_clbckOpts={"start":this.__select_start,"finish":this.__select_finish};
         
         //Deshabilitar Cosas de abajo (botones)
         this.Dom_Manager.disable("select_startBtn");
@@ -69,14 +85,14 @@ class ShowPath_GameMode extends Base_GameMode{
 
     allowSelect_startNode(){ //activamos modo seleccionar nodo de start
         this.__setAll_default();
-        this.nodeSelection_callback=this.nodeSelection["start"];
+        this.nodeSelection_callback=this.nodeSelection_clbckOpts["start"];
         //deshabilitar end button
         this.Dom_Manager.disable("select_endBtn");
         this.Dom_Manager.disable("remove_edgeBtn");
     }
   
     allowSelect_finishNode(){//actibamos modo de selecionar nodo de finish
-        this.nodeSelection_callback=this.nodeSelection["finish"];
+        this.nodeSelection_callback=this.nodeSelection_clbckOpts["finish"];
         this.Dom_Manager.disable("remove_edgeBtn");
     }
 

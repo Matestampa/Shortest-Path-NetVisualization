@@ -7,6 +7,8 @@ import {GraphDraw_Manager} from "./GraphGenerator_tools/Graphics/main_draws.js";
 
 import type { _2DCoords_Type } from "./GraphGenerator_tools/DataGraph_Generators/types.js";
 
+import type { DrawGraphElems_conf } from "./types.js";
+
 //------- Imoports del generate_shortPath --------
 import { Dijkstra,A_Star } from "./GraphGenerator_tools/Graph_functionality/path_algorithms.js";
 
@@ -32,7 +34,7 @@ class GraphGenerator{
     InMemoryGraph:InMemory_Graph
     DrawGraph:GraphDraw_Manager
 
-    constructor(type:string,area_limits:_2DCoords_Type,draw_data){
+    constructor(type:string,area_limits:_2DCoords_Type,draw_data:DrawGraphElems_conf){
       
       let area_size={"width":area_limits.x[1]-area_limits.x[0],"height":area_limits.y[1]-area_limits.y[0]};
       this.min_dist=30; //fijamos esta minima distanica entre nodes

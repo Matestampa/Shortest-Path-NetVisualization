@@ -1,6 +1,8 @@
 import {GraphGenerator as GraphGenerat,generate_shortPath} from "../generators.js";
 import {sleep} from "./GameMode_tools/extras.js";
 
+import type { DrawGraphElems_conf } from "../types.js";
+
 import type { Dom_Manager } from "./GameMode_tools/Dom_Manager.js";
 
 import type { InMemory_Graph,GraphDraw_Manager } from "../generators.js";
@@ -16,7 +18,7 @@ abstract class Base_GameMode{
     path_colors:{}
     selectedNode_color:string
 
-    DrawManager_config:{}
+    DrawManager_config:DrawGraphElems_conf
     Dom_Manager:Dom_Manager
 
     GraphGenerator:GraphGenerat

@@ -24,6 +24,7 @@
     "ts-loader": "^9.5.1"
   },
   "devDependencies": {
+    "@types/fabric": "^5.3.8",
     "css-loader": "^6.8.1",
     "html-webpack-plugin": "^5.5.3",
     "mini-css-extract-plugin": "^2.7.6",

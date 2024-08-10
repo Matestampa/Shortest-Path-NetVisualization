@@ -49,7 +49,7 @@ class PriorQueue{
       this.__re_order(toUpdate_index);
    }
    
-   pop_from(option:("start"|"medium"|"end") = "end"){
+   pop_from(option:("start"|"medium"|"end"|string) = "end"){
       if (this.list.length==0){throw new Error("The queue is empty")};
       if (this.list.length==1 && option=="medium"){option="end"}; //si es medium y solo hay uno nos va a dar error de index
       

@@ -1,3 +1,7 @@
+/Anotaciones
 /node_modules
+/build
 /dist
 /.vscode
+
+nodemon.json

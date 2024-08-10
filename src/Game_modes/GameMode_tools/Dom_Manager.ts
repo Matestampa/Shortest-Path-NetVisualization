@@ -1,9 +1,11 @@
 //------------------- Base Obj ----------------------
+
 class Input_Element{
-    constructor(domElement){
+    element:HTMLInputElement
+    constructor(domElement:HTMLInputElement){
         this.element=domElement;
     }
-    get(){
+    get():(string|boolean){
         return this.element.value;
     }
 
@@ -13,12 +15,12 @@ class Input_Element{
 
     enable(){
         this.element.disabled=false;
-        this.element.style.opacity=1;
+        this.element.style.opacity="1";
     }
 
     disable(){
         this.element.disabled=true;
-        this.element.style.opacity=0.7;
+        this.element.style.opacity="0.7";
     }
 
 }
@@ -28,28 +30,12 @@ class Text extends Input_Element{
         super(domElement);
         this.element=domElement;
     }
-
-    get(){
-        return this.element.value;
-    }
-
-    set(value){
-        this.element.value=value;
-    }
 }
 
 class Range extends Input_Element{
     constructor(domElement){
         super(domElement);
         this.element=domElement;
-    }
-
-    get(){
-        return this.element.value;
-    }
-
-    set(value){
-        this.element.value=value;
     }
 }
 
@@ -60,7 +46,8 @@ class Select extends Input_Element{
     }
 
     get(){
-        return this.element.options[this.element.selectedIndex].value;
+        let elem=this.element as unknown as HTMLSelectElement
+        return elem.options[elem.selectedIndex].value;
     }
 
     set(value){}
@@ -84,13 +71,35 @@ class Button extends Input_Element{
     }
 }
 
+//Obj con los contructors
+const INPUT_ELEMENTS={
+    "text":Text,
+    "range":Range,
+    "select":Select,
+    "checkbox":CheckBx,
+    "button":Button
+}
+
+//Obj para q los q los usan puedan pasar bien el tipo del que quieren
+const INPUT_ELEMENTS_OPTIONS={
+    "text":"text",
+    "range":"range",
+    "select":"select",
+    "checkbox":"checkbox",
+    "button":"button"
+}
+
 //-------------------------------------------------------------------------------------
 //------ Permite hacer acciones simples(como obtener data o activar/desactivar) con objetos del dom, de forma sencilla---
-export class Dom_Manager{
+class Dom_Manager{
+    
+    objects:Map<"id",Input_Element>
+    data:{"id":any,"type":"string"}[];
+    //types:{[key:string]:typeof Input_Element}
+    
     constructor(){
-        this.objects={};
+        this.objects=new Map();
         this.data=[];
-        this.types={"text":Text,"range":Range,"select":Select,"checkbox":CheckBx,"button":Button};
     }
     
     //Se pasan los objs que se quieren usar, con sus ids que tendran en el dom
@@ -126,11 +135,13 @@ export class Dom_Manager{
     }
 
     __add(id,type){
-        let element=document.getElementById(id);
+        let element=document.getElementById(id) as unknown as HTMLInputElement;
         if (element){
-            let ObjType=this.types[type];
+            let ObjType=INPUT_ELEMENTS[type];
             this.objects[id]=new ObjType(element);
 
         }
     }
 }
+
+export {Dom_Manager,INPUT_ELEMENTS_OPTIONS};

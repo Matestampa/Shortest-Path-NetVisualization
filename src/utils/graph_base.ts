@@ -1,22 +1,34 @@
 //Aca va la data structure basica de grafo
 
 class Edge{
-    constructor(value,height){
+
+    value:any;
+    height:number;
+    next!:Edge;
+
+    constructor(value:any,height:number){
         this.value=value;
         this.height=height;
 
         this.next;
+
     }
 }
 
 
 class Edges_List{
+
+    /*head!:Edge
+    last!:Edge*/
+    head:(Edge|undefined);
+    last:(Edge|undefined);
+
     constructor(){
         this.head;
         this.last;
     }
 
-    append(value,height){
+    append(value:any,height:number){
         let new_node=new Edge(value,height);
         if (this.head==undefined){
             this.head=new_node;
@@ -28,7 +40,7 @@ class Edges_List{
         }
     }
 
-    remove(value){
+    remove(value:any){
         let prev;
         let actual=this.head;
 
@@ -60,7 +72,7 @@ class Edges_List{
         }
     }
 
-    get(value){
+    get(value:any):(Edge|false){
         let actual=this.head;
         while (actual!=undefined){
             if (actual.value==value){
@@ -71,7 +83,7 @@ class Edges_List{
         return false;
     }
 
-    get_all(){
+    get_all():Edge[]{
         let list=[];
         let actual=this.head;
 
@@ -82,7 +94,7 @@ class Edges_List{
         return list;
     }
 
-    search(value){
+    search(value:any):boolean{
         let actual=this.head;
         while (actual!=undefined){
             if (actual.value==value){
@@ -106,21 +118,25 @@ class Edges_List{
 }
 
 
-export class Node{
-    constructor(value){
+class Node{
+    
+    value:any;
+    neighs:Edges_List;
+
+    constructor(value:any){
         this.value=value;
         this.neighs=new Edges_List();
     }
 
-    connect(value,height){
+    connect(value:any,height:number){
         this.neighs.append(value,height);
     }
 
-    disconnect(value){
+    disconnect(value:any){
         this.neighs.remove(value);
     }
     
-    get_neigh(value){
+    get_neigh(value:any){
         return this.neighs.get(value);
     }
 
@@ -138,7 +154,7 @@ export class Node{
         }
     }
 
-    has_neigh(value){
+    has_neigh(value:any):boolean{
         return this.neighs.search(value);
     }
 
@@ -148,13 +164,20 @@ export class Node{
 }
 
 
-export class Graph{
+type NodesMap_type={
+    [key:string]:Node
+}
+
+class Graph{
+    
+    nodes:NodesMap_type
+
     constructor(){
         this.nodes={};
     }
     
     //el node_obj que se pase debe ser si o si de algun tipo Node().
-    add_node(value,node_obj=undefined){
+    add_node(value:string,node_obj=undefined){
         if (this.nodes[value]==undefined){
             if (node_obj){
                 this.nodes[value]=node_obj;
@@ -168,7 +191,7 @@ export class Graph{
         }
     }
 
-    remove_node(value){
+    remove_node(value:string){
         let neighs=this.nodes[value].get_neighs();
 
         for (let i of neighs){
@@ -178,24 +201,24 @@ export class Graph{
         delete this.nodes[value];
     }
 
-    get_node(value){
+    get_node(value:string):Node{
         if (this.nodes[value]==undefined){
             throw new Error(`Node: '${value}' doesnt exist`)
         }
         return this.nodes[value];
     }
 
-    add_edge(nodeVal_1,nodeVal_2,height=0){
+    add_edge(nodeVal_1:any,nodeVal_2:any,height=0){
         this.nodes[nodeVal_1].connect(nodeVal_2,height);
         this.nodes[nodeVal_2].connect(nodeVal_1,height);
     }
 
-    remove_edge(nodeVal_1,nodeVal_2){
+    remove_edge(nodeVal_1:string,nodeVal_2:string){
         this.nodes[nodeVal_1].disconnect(nodeVal_2);
         this.nodes[nodeVal_2].disconnect(nodeVal_1);
     }
 
-    get_edge(nodeVal_1,nodeVal_2){
+    get_edge(nodeVal_1:string,nodeVal_2:string){
         if (this.nodes[nodeVal_1]==undefined){
             throw new Error("This edge does not exists");
         }
@@ -217,5 +240,4 @@ export class Graph{
     }
 }
 
-//window.Graph=Graph;
-//window.Node=Node
+export {Node,Graph};

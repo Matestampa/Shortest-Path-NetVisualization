@@ -1,21 +1,28 @@
 import {fabric} from "fabric";
 
-class GraphDraw_Element{
-    constructor(value,object_data){
+abstract class GraphDraw_Element{
+
+    type:string
+    value:any
+    cv_object:fabric.Object
+
+    constructor(value:any,object_data:{}){
         this.type="cada uno pone el suyo";
         this.value=value;
         this.cv_object=this.p__create_object(object_data);
     }
+
+    abstract p__create_object(object_data):fabric.Object
 }
 
 
-export class GraphDraw_Node extends GraphDraw_Element{
-    constructor(value,object_data){
+class GraphDraw_Node extends GraphDraw_Element{
+    constructor(value:any,object_data:{}){
         super(value,object_data);
         this.type="node";
     }
 
-    change_color(color){
+    change_color(color:string){
         this.cv_object.set("fill",color);
     }
 
@@ -25,13 +32,13 @@ export class GraphDraw_Node extends GraphDraw_Element{
     }
 }
 
-export class GraphDraw_Edge extends GraphDraw_Element{
-    constructor(value,object_data){
+class GraphDraw_Edge extends GraphDraw_Element{
+    constructor(value:any,object_data:{}){
         super(value,object_data);
         this.type="edge";
     }
 
-    change_color(color){
+    change_color(color:string){
         this.cv_object.set("stroke",color);
     }
 
@@ -41,7 +48,7 @@ export class GraphDraw_Edge extends GraphDraw_Element{
     }
 }
 
-export class GraphDraw_Division extends GraphDraw_Element{
+class GraphDraw_Division extends GraphDraw_Element{
     constructor(value,object_data){
         super(value,object_data);
         this.type="division";
@@ -57,3 +64,5 @@ export class GraphDraw_Division extends GraphDraw_Element{
         return new_div;
     }
 }
+
+export {GraphDraw_Node,GraphDraw_Edge};

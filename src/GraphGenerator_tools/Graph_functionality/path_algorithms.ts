@@ -1,7 +1,26 @@
 //Priority Queue adaptado para ShortPath
 import { PriorQueue } from "../../utils/pQueue.js";
+import { Coord_Node, InMemory_Graph } from "./InMemory_Graph.js";
+
+//------------------- TYPES --------------------------------
+
+type stepsORpathArr_type=(string |`${string},${string}`)[]
+
+type shortestPath_data={
+    "reached":boolean
+    "path":stepsORpathArr_type,
+    "steps":stepsORpathArr_type,
+    "dist":number
+}
+
+//------------------  Pqueue especifica Util  ----------------------
 
 class ShortPath_pQueue extends PriorQueue{
+    
+    visited_nodes:{
+        [key:string]:number
+    }
+
     constructor(){
         super();
         this.visited_nodes={};
@@ -28,14 +47,22 @@ class ShortPath_pQueue extends PriorQueue{
 }
 
 //-------------------------- Clase Padre -----------------------------------------
-class ShortPath_Algorithm{
-    constructor(Graph){
+abstract class ShortPath_Algorithm{
+
+    Graph:InMemory_Graph
+    path:stepsORpathArr_type
+    steps:stepsORpathArr_type
+    
+    start_node:Coord_Node
+    end_node:Coord_Node
+
+    constructor(Graph:InMemory_Graph){
       this.Graph=Graph;
       this.path=[];
       this.steps=[];
     }
 
-    find_path(start,end){
+    find_path(start:string,end:string):shortestPath_data{
         [this.start_node,this.end_node]=this.__check(start,end);
 
         const previouses={}; //los previos de cada uno, para poder hacer el camino despues
@@ -61,8 +88,8 @@ class ShortPath_Algorithm{
 
            already_poped[poped_obj.value]=1;
            
-           //Si damos con el end
-           if (poped_obj.value==end){return {"reached":true,"path":this.__path(end,previouses),"steps":this.steps,"dist":parseInt(poped_dist)}};
+           //---- Si damos con el end hacemos return----
+           if (poped_obj.value==end){return {"reached":true,"path":this.__path(end,previouses),"steps":this.steps,"dist":Math.ceil(poped_dist)}};
 
            let node=this.Graph.get_node(poped_obj.value);
            
@@ -98,7 +125,7 @@ class ShortPath_Algorithm{
     }
     
     //Chequea si los nodos ,pasados para el path, estan en el Grafo y de ser asi los devuelve
-    __check(start_value,end_value){ //Array
+    private __check(start_value:string,end_value:string):[Coord_Node,Coord_Node]{ 
         let start_node,end_node;
         try{
             start_node=this.Graph.get_node(start_value);
@@ -113,7 +140,7 @@ class ShortPath_Algorithm{
     }
     
     //Construye el path, una vez encontrado el final.
-    __path(end,previouses){ //Array
+    private __path(end:string,previouses:{}):stepsORpathArr_type{ 
         const path=[];
         let curr=end;
         let prev;
@@ -131,60 +158,57 @@ class ShortPath_Algorithm{
     
     //Obtiene la dist del element sacado del Pqueue.
     //Puede elegir si usar la cant del Pqueue o si usa otro attr propio del poped.obj.
-    p__get_popedDist(poped){ //int
-    }
+    abstract p__get_popedDist(poped:{}):number
     
     //Determina la nueva dist con la que se llega a un node
-    p__get_new_neighDist(poped_dist,neigh){ //int
-    }
+    abstract p__get_new_neighDist(poped_dist:number,neigh):number
     
     //Contruye el obj que se debe meter en la Pqueue.
     //Si o si debe contener {"value":,"prev"}
-    p__build_obj2Queue(neigh,poped_value,poped_dist){ //obj {"value":str,"prev":str,....los que se agreguen}
+    p__build_obj2Queue(neigh,poped_value:string,poped_dist:number){ //obj {"value":str,"prev":str,....los que se agreguen}
     }
     
     //Costo para agregarle a la nueva dist con la que se llega a un node.
-    p__add_cost(neigh,poped_dist){ //int
-    }
+    abstract p__add_cost(neigh,poped_dist:number):number
 }
 
 //---------------- Clases individuales ---------------------------------
-export class Dijkstra extends ShortPath_Algorithm{
-    constructor(Graph){
+class Dijkstra extends ShortPath_Algorithm{
+    constructor(Graph:InMemory_Graph){
         super(Graph);
     }
 
-    p__get_popedDist(poped){
+    p__get_popedDist(poped):number{
         return poped.cant;
     }
 
-    p__get_new_neighDist(poped_dist,neigh){
+    p__get_new_neighDist(poped_dist:number,neigh):number{
         return poped_dist+neigh.height;
   
     }
 
-    p__build_obj2Queue(neigh,poped_value,poped_dist){
+    p__build_obj2Queue(neigh,poped_value:string,poped_dist:number){
         return {"value":neigh.value,"prev":poped_value};
     }
 
-    p__add_cost(neigh,poped_dist){
+    p__add_cost(neigh,poped_dist:number):number{
         return 0;
     }
 }
 
-export class A_Star extends ShortPath_Algorithm{
-    constructor(Graph){
+class A_Star extends ShortPath_Algorithm{
+    constructor(Graph:InMemory_Graph){
         super(Graph);
     }
-    p__get_popedDist(poped){
+    p__get_popedDist(poped):number{
         return poped.obj.origDist;
     }
 
-    p__get_new_neighDist(poped_dist,neigh){
+    p__get_new_neighDist(poped_dist:number,neigh):number{
         return poped_dist+neigh.height;
     }
 
-    p__build_obj2Queue(neigh,poped_value,poped_dist){
+    p__build_obj2Queue(neigh,poped_value:string,poped_dist:number){
         let neigh_height;
         if (neigh.height){neigh_height=neigh.height}else{neigh_height=0}
         
@@ -192,13 +216,16 @@ export class A_Star extends ShortPath_Algorithm{
     }
     
     //En este caso le metemos un cost basado en la distancia con respecto al end.
-    p__add_cost(neigh,poped_dist){
-        let neigh_node=this.Graph.get_node(neigh.value);
+    p__add_cost(neigh,poped_dist:number):number{
+        let neigh_node=this.Graph.get_node(neigh.value) as Coord_Node;
         let heuristic=this.__get_dist([this.end_node.x,this.end_node.y],[neigh_node.x,neigh_node.y]);
         return poped_dist+neigh.height+heuristic;
     }
 
-    __get_dist(coords1,coords2){
+    private __get_dist(coords1,coords2):number{
         return Math.round(Math.sqrt((coords2[0]-coords1[0])**2 + (coords2[1]-coords1[1])**2));
     }
 }
+
+export type {ShortPath_Algorithm,shortestPath_data};
+export {Dijkstra,A_Star};

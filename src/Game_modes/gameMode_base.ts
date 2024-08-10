@@ -9,7 +9,7 @@ import type { InMemory_Graph,GraphDraw_Manager } from "../generators.js";
 
 
 //-------------- Clase Base de la que debe heredar todo GameMode ------------------------
-abstract class Base_GameMode{
+abstract class Base_GameMode_Class{
     
     area_limits:{"x":[number,number],"y":[number,number]}
 
@@ -156,4 +156,4 @@ abstract class Base_GameMode{
 
 }
 
-export {Base_GameMode};
+export {Base_GameMode_Class};

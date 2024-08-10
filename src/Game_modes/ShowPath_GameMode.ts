@@ -1,4 +1,4 @@
-import {Base_GameMode} from "./gameMode_base.js";
+import {Base_GameMode_Class} from "./gameMode_base.js";
 import {Dom_Manager,
        INPUT_ELEMENTS_OPTIONS as INPUT_ELEMS} from "./GameMode_tools/Dom_Manager.js";
 
@@ -63,7 +63,7 @@ ObJ_Manager.set_objsData(
 
 
 //--------------------------- CLASE GAMEMODE ---------------------------------
-class ShowPath_GameMode extends Base_GameMode{
+class ShowPath_GameMode_Class extends Base_GameMode_Class{
     
     nodeSelection_clbckOpts:{start:(obj)=>void,finish:(obj)=>void}
     nodeSelection_callback:(obj)=>void
@@ -193,6 +193,6 @@ class ShowPath_GameMode extends Base_GameMode{
 }
 
 
-let toExport={"html":HTML,"functions":functions,"Obj_Manager":ObJ_Manager,"class":ShowPath_GameMode}
+let toExport={"html":HTML,"functions":functions,"Obj_Manager":ObJ_Manager,"class":ShowPath_GameMode_Class}
 
 export {toExport as ShowPath_GameMode};

@@ -50,7 +50,9 @@ class Select extends Input_Element{
         return elem.options[elem.selectedIndex].value;
     }
 
-    set(value){}
+    set(value){
+        this.element.value=value;
+    }
 }
 
 class CheckBx extends Input_Element{

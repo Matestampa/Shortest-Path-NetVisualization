@@ -185,7 +185,7 @@ class GraphDraw_Manager{
     setClick_event(tags:any[],callback:(obj)=>void){ 
       let objs=this.objects.get(tags);
       for (let obj of objs){
-        obj.cv_object.on("selected",function(){
+        obj.cv_object.on("mousedown",function(){
           return callback(obj);
         })
         obj.cv_object.hoverCursor="pointer";
@@ -196,7 +196,7 @@ class GraphDraw_Manager{
     removeClick_event(tags:any[]){
       let objs=this.objects.get(tags);
       for (let obj of objs){
-        obj.cv_object.off("selected");
+        obj.cv_object.off("mousedown");
         obj.cv_object.hoverCursor="default";
       }
     }

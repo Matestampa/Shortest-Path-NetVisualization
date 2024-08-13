@@ -68,6 +68,8 @@ class ShowPath_GameMode_Class extends Base_GameMode_Class{
     nodeSelection_clbckOpts:{start:(obj)=>void,finish:(obj)=>void}
     nodeSelection_callback:(obj)=>void
 
+    DEFAULT_ALGO:string;
+
 
     constructor(area_limits,Canvas,Dom_Manager){
         super(area_limits,Canvas,Dom_Manager);
@@ -75,6 +77,8 @@ class ShowPath_GameMode_Class extends Base_GameMode_Class{
         //Callbacks al hacer click en un Node
         this.nodeSelection_clbckOpts={"start":this.__select_start,"finish":this.__select_finish};
         
+        this.DEFAULT_ALGO="Dijkstra"
+
         //Deshabilitar Cosas de abajo (botones)
         this.Dom_Manager.disable("select_startBtn");
         this.Dom_Manager.disable("select_endBtn");
@@ -132,7 +136,11 @@ class ShowPath_GameMode_Class extends Base_GameMode_Class{
         
         //elegir algorithm de pantalla
         let pathAlgorithm=this.Dom_Manager.get("algorithm");
-        if (pathAlgorithm=="Algorithm"){alert("Choose an Algorithm");return;}
+        if (pathAlgorithm=="Algorithm"){
+            //alert("Choose an Algorithm");return;
+            this.Dom_Manager.set("algorithm",this.DEFAULT_ALGO);
+            pathAlgorithm=this.DEFAULT_ALGO;
+        }
         
         let results=this.__find_path(this.start_node,this.end_node,pathAlgorithm);
         let [path,steps]=[results.path,results.steps];
